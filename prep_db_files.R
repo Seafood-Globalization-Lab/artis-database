@@ -1,19 +1,22 @@
 
+packdir <- "/project/ARTIS/Package"
+setwd(packdir) # note: If running on zorro need to set directory to packdir before #devtools::install()
+
 # Libraries
-library(tidyverse)
-library(countrycode)
+library(tidyverse, lib.loc = "/home/rahulab/R/x86_64-pc-linux-gnu-library/3.6/")
+library(countrycode, lib.loc = "/home/rahulab/R/x86_64-pc-linux-gnu-library/3.6/")
 
 # Resetting workspace
 rm(list=ls())
 
 # Directories and filenames
-datadir <- "/project/database/inputs"
-outdir <- "/project/database/outputs"
+datadir <- "/project/ARTIS/ARTIS/database/inputs"
+outdir <- "/project/ARTIS/ARTIS/database/outputs"
 
 sciname_filename <- "sciname_metadata_original.csv"
 isscaap_filename <- "sciname_isscaap_matches.csv"
 countries_filename <- "countries.csv"
-hs_codes_filename <- "ALL_HS_Codes.csv"
+hs_codes_filename <- "All_HS_Codes.csv"
 prod_filename <- "clean_fao_prod.csv"
 
 ################################################################################
@@ -28,7 +31,7 @@ sciname <- sciname %>%
   full_join(isscaap, by="SciName") %>%
   rename(isscaap = isscaap_group) %>%
   rename(common_name = CommonName) %>%
-  rename(fresh = fresh01, brack = brack01, saltwater = saltwater01)
+  rename(fresh = Fresh01, brack = Brack01, saltwater = Saltwater01)
 
 # All column names lower case
 colnames(sciname) <- tolower(colnames(sciname))
@@ -67,7 +70,7 @@ products <- read.csv(file.path(datadir, hs_codes_filename))
 products <- products %>%
   mutate(Code = as.character(Code)) %>%
   mutate(Code = case_when(
-    str_length(Code) < ~ paste("0", Code, sep=""),
+    str_length(Code) < 6 ~ paste("0", Code, sep=""),
     TRUE ~ Code
   ))
 
@@ -75,7 +78,7 @@ products <- products %>%
 # code_pre, code_post, presentation_pre, presentation_post, state_pre, state_post
 
 # Get list of all hs-hs-match files
-prep_state_files <- list.files(path=datadir, pattern="hs-hs-match", include.dirs=TRUE)
+prep_state_files <- list.files(path=datadir, pattern="hs-hs-match", include.dirs=FALSE)
 prep_state <- data.frame()
 
 for (i in 1:length(prep_state_files)) {
@@ -113,6 +116,29 @@ write.csv(products, file.path(outdir, "products.csv"), row.names=FALSE)
 
 ################################################################################
 # Cleaning BACI data
+
+baci_files <- list.files(path=datadir, pattern="baci_seafood_hs", include.dirs=FALSE)
+
+baci <- data.frame()
+
+for (i in 1:length(baci_files)) {
+  curr_baci_filename <- baci_files[i]
+  curr_baci <- read.csv(file.path(datadir, curr_baci_filename))
+  
+  curr_hs <- toupper(substring(curr_baci_filename, 14, 17))
+  curr_year <- as.integer(substring(curr_baci_filename, nchar(curr_baci_filename) - 3))
+  
+  curr_baci <- curr_baci %>%
+    mutate(hs_version=curr_hs,
+           year=curr_year) %>%
+    select(c("exporter_iso3c", "importer_iso3c", "hs6", "total_q", "hs_version", "year")) %>%
+    rename(product_weight_t = total_q)
+  
+  baci <- baci %>%
+    bind_rows(curr_baci)
+}
+
+write.csv(baci, file.path(outdir, "baci.csv"), row.names=FALSE)
 
 ################################################################################
 # Cleaning Production data

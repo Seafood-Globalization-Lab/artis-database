@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#BSUB -J ARTIS_prep_db_files
+#BSUB -q long
+#BSUB -o ARTIS_prep_db_files_output_log_%J.txt
+#BSUB -e ARTIS_prep_db_files_error_log_%J.txt
+#BSUB -u mail user rahulab@american.edu
+#BSUB -B
+#BSUB -N
+#BSUB n=11
+
+module load gcc/9.2.0
+
+/app/R-3.6.1/bin/R CMD BATCH /project/ARTIS/Package/prep_db_files.R
