@@ -11,5 +11,6 @@ CREATE TABLE snet(
     product_weight_t FLOAT,
     live_weight_t FLOAT,
     hs_version INT,
-    "year" INT
+    "year" INT,
+    snet_est VARCHAR(3)
 );
