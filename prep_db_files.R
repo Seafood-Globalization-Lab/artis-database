@@ -96,7 +96,8 @@ for (i in 1:length(prep_state_files)) {
     distinct() %>%
     mutate(hs6 = as.character(hs6)) %>%
     mutate(hs6 = case_when(
-      str_length(hs6) < 6 ~ paste("0", hs6, sep="")
+      str_length(hs6) < 6 ~ paste("0", hs6, sep=""),
+      TRUE ~ hs6
     ))
   
   prep_state <- prep_state %>%
@@ -126,7 +127,7 @@ for (i in 1:length(baci_files)) {
   curr_baci <- read.csv(file.path(datadir, curr_baci_filename))
   
   curr_hs <- toupper(substring(curr_baci_filename, 14, 17))
-  curr_year <- as.integer(substring(curr_baci_filename, nchar(curr_baci_filename) - 3))
+  curr_year <- as.integer(substring(curr_baci_filename, nchar(curr_baci_filename) - 7, nchar(curr_baci_filename) - 4))
   
   curr_baci <- curr_baci %>%
     mutate(hs_version=curr_hs,
@@ -159,4 +160,25 @@ prod <- prod %>%
 # Writing out results
 write.csv(prod, file.path(outdir, "prod.csv"), row.names=FALSE)
 
+################################################################################
+# Prepare and Combine all Snets created (min, mid, max)
+
+snet_files <- list.dirs(path=datadir, pattern="artis_ts.csv")
+
+snet <- data.frame()
+
+for (i in 1:length(snet_files)) {
+  curr_file <- snet_files[i]
+  curr_snet <- read.csv(file.path(datadir, curr_file))
+  
+  snet_type <- tolower(substring(curr_file, 1, 3))
+  
+  curr_snet <- curr_snet %>%
+    mutate(snet_est = snet_type)
+  
+  snet <- snet %>%
+    bind_rows(curr_snet)
+}
+
+write.csv(snet, file.path(outdir, "snet.csv"), row.names=FALSE)
 ################################################################################
