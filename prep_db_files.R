@@ -163,7 +163,7 @@ write.csv(prod, file.path(outdir, "prod.csv"), row.names=FALSE)
 ################################################################################
 # Prepare and Combine all Snets created (min, mid, max)
 
-snet_files <- list.dirs(path=datadir, pattern="artis_ts.csv")
+snet_files <- list.files(path=datadir, pattern="artis_ts.csv")
 
 snet <- data.frame()
 
@@ -174,7 +174,12 @@ for (i in 1:length(snet_files)) {
   snet_type <- tolower(substring(curr_file, 1, 3))
   
   curr_snet <- curr_snet %>%
-    mutate(snet_est = snet_type)
+    mutate(snet_est = snet_type) %>%
+    mutate(hs_version = as.character(hs_version)) %>%
+    mutate(hs_version = case_when(
+      str_length(hs_version) == 1 ~ paste("0", hs_version, sep=""),
+      TRUE ~ hs_version)) %>%
+    mutate(hs_version = paste("HS", hs_version, sep=""))
   
   snet <- snet %>%
     bind_rows(curr_snet)

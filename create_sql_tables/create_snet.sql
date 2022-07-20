@@ -10,7 +10,7 @@ CREATE TABLE snet(
     "method" VARCHAR(100),
     product_weight_t FLOAT,
     live_weight_t FLOAT,
-    hs_version INT,
+    hs_version VARCHAR(4),
     "year" INT,
     snet_est VARCHAR(3)
 );
