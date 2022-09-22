@@ -11,8 +11,5 @@ CREATE TABLE sciname(
     phylum VARCHAR(100),
     kingdom VARCHAR(100),
     aquarium VARCHAR(100),
-    fresh BOOLEAN,
-    brack BOOLEAN,
-    saltwater BOOLEAN,
     isscaap VARCHAR(100)
 );
