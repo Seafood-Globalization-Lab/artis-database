@@ -6,7 +6,7 @@ CREATE TABLE snet(
     source_country_iso3c VARCHAR(7),
     hs6 VARCHAR(6),
     sciname VARCHAR(100),
-    environment VARCHAR(100),
+    habitat VARCHAR(100),
     "method" VARCHAR(100),
     product_weight_t FLOAT,
     live_weight_t FLOAT,

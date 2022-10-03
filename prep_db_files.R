@@ -1,71 +1,46 @@
 
-packdir <- "/project/ARTIS/Package"
-setwd(packdir) # note: If running on zorro need to set directory to packdir before #devtools::install()
-
 # Libraries
-library(tidyverse, lib.loc = "/home/rahulab/R/x86_64-pc-linux-gnu-library/3.6/")
-library(countrycode, lib.loc = "/home/rahulab/R/x86_64-pc-linux-gnu-library/3.6/")
+library(tidyverse)
+library(countrycode)
 
 # Resetting workspace
 rm(list=ls())
 
 # Directories and filenames
-datadir <- "/project/ARTIS/ARTIS/database/inputs"
-outdir <- "/project/ARTIS/ARTIS/database/outputs"
+datadir <- "/Volumes/jgephart/ARTIS/Outputs/model_inputs_20220926"
+clean_metadatadir <- "/Volumes/jgephart/ARTIS/Outputs/clean_metadata"
+snet_dir <- "/Volumes/jgephart/ARTIS/Outputs/snet_20220926"
+outdir <- "/Volumes/jgephart/ARTIS/Outputs/SQL_Database/20220928"
 
-sciname_filename <- "sciname_metadata_original.csv"
-isscaap_filename <- "sciname_isscaap_matches.csv"
+# sciname_filename <- "sciname_metadata_original.csv"
+# isscaap_filename <- "sciname_isscaap_matches.csv"
 countries_filename <- "countries.csv"
 hs_codes_filename <- "All_HS_Codes.csv"
-prod_filename <- "clean_fao_prod.csv"
+prod_filename <- "standardized_fao_prod.csv"
 
 ################################################################################
 # Creating sciname table
 
-# Initial dataframes
-sciname <- read.csv(file.path(datadir, sciname_filename))
-isscaap <- read.csv(file.path(datadir, isscaap_filename))
+sciname <- read.csv(file.path(clean_metadatadir, "sciname_metadata.csv"))
 
 # Joining and renaming sciname metadata and isscaap groups
 sciname <- sciname %>%
-  full_join(isscaap, by="SciName") %>%
   rename(isscaap = isscaap_group) %>%
-  rename(common_name = CommonName) %>%
+  # rename(common_name = CommonName) %>%
   rename(fresh = Fresh01, brack = Brack01, saltwater = Saltwater01)
 
 # All column names lower case
 colnames(sciname) <- tolower(colnames(sciname))
 
 # Writing out results
-write.csv(sciname, file.path(outdir, "sciname.csv"), row.names=FALSE)
-
-################################################################################
-# Creating Country metadata table
-# ISO 3 code, ISO 2 code, country name, region
-
-# Read in list of countries found in K Drive data folder
-countries <- read.csv(file.path(datadir, countries_filename))
-
-# Add country metadata
-countries <- countries %>%
-  mutate(iso2c = countrycode(iso3c, origin="iso3c", destination="iso2c"),
-         country_name = countrycode(iso3c, origin="iso3c", destination="country.name"),
-         continent = countrycode(iso3c, origin="iso3c", destination="continent"),
-         eu_status = countrycode(iso3c, origin="iso3c", destination="eu28")) %>%
-  mutate(eu_status = case_when(
-    eu_status == "EU" ~ TRUE,
-    TRUE ~ FALSE
-  ))
-
-# Writing out results
-write.csv(countries, file.path(outdir, "countries.csv"), row.names=FALSE)
+write.csv(sciname, file.path(outdir, "sciname.csv"), row.names = FALSE)
 
 ################################################################################
 # Creating Product metadata table
 # hs codes, descriptions, FMFO status, product form
 
 # Read in list of HS codes found in K Drive Data folder
-products <- read.csv(file.path(datadir, hs_codes_filename))
+products <- read.csv(file.path("/Volumes/jgephart/ARTIS/Data/", hs_codes_filename))
 
 products <- products %>%
   mutate(Code = as.character(Code)) %>%
@@ -105,7 +80,10 @@ for (i in 1:length(prep_state_files)) {
 }
 
 products <- products %>%
-  left_join(prep_state, by=c("Code"="hs6"))
+  left_join(prep_state, by=c("Code"="hs6")) %>%
+  rename(hs6 = Code)
+
+names(products) <- tolower(names(products))
 
 # Writing out results
 write.csv(products, file.path(outdir, "products.csv"), row.names=FALSE)
@@ -118,15 +96,16 @@ write.csv(products, file.path(outdir, "products.csv"), row.names=FALSE)
 ################################################################################
 # Cleaning BACI data
 
-baci_files <- list.files(path=datadir, pattern="baci_seafood_hs", include.dirs=FALSE)
+baci_files <- list.files(path=datadir, pattern="standardized_baci_seafood_hs", include.dirs=FALSE)
 
 baci <- data.frame()
 
 for (i in 1:length(baci_files)) {
   curr_baci_filename <- baci_files[i]
+  print(curr_baci_filename)
   curr_baci <- read.csv(file.path(datadir, curr_baci_filename))
   
-  curr_hs <- toupper(substring(curr_baci_filename, 14, 17))
+  curr_hs <- toupper(substring(curr_baci_filename, nchar(curr_baci_filename) - 13, nchar(curr_baci_filename) - 10))
   curr_year <- as.integer(substring(curr_baci_filename, nchar(curr_baci_filename) - 7, nchar(curr_baci_filename) - 4))
   
   curr_baci <- curr_baci %>%
@@ -139,7 +118,19 @@ for (i in 1:length(baci_files)) {
     bind_rows(curr_baci)
 }
 
-write.csv(baci, file.path(outdir, "baci.csv"), row.names=FALSE)
+baci <- baci %>%
+  filter(
+    # Use HS96 from 1996-2003 (inclusive)
+    ((hs_version == "HS96") & (year <= 2003)) |
+      # Use HS02 from 2004-2009 (inclusive)
+      ((hs_version == "HS02") & (year >= 2004 & year <= 2009)) |
+      # Use HS07 from 2010-2012 (inclusive)
+      ((hs_version == "HS07") & (year >= 2010 & year <= 2012)) |
+      # Use HS12 from 2013-2019 (inclusive)
+      ((hs_version == "HS12") & (year >= 2013 & year <= 2019))
+  )
+
+write.csv(baci, file.path(outdir, "baci.csv"), row.names = FALSE)
 
 ################################################################################
 # Cleaning Production data
@@ -153,7 +144,7 @@ prod <- prod %>%
   rename(
     iso3c = country_iso3_alpha,
     sciname = SciName,
-    environment = habitat,
+    method = prod_method,
     live_weight_t = quantity
   )
 
@@ -161,29 +152,60 @@ prod <- prod %>%
 write.csv(prod, file.path(outdir, "prod.csv"), row.names=FALSE)
 
 ################################################################################
+# Creating Country metadata table
+
+# Create a country list based on production and BACI data (standardized countries)
+countries <- data.frame(
+  iso3c = unique(c(prod$iso3c, baci$exporter_iso3c, baci$importer_iso3c))
+)
+
+owid_region <- read.csv("/Volumes/jgephart/ARTIS/Data/owid_regions.csv")
+
+# Add metadata
+countries <- countries %>%
+  # Add country name
+  mutate(country_name = case_when(
+    iso3c == "NEI" ~ "Other nei",
+    iso3c == "SCG" ~ "Serbia & Montenegro",
+    TRUE ~ countrycode(iso3c, origin = "iso3c", destination = "country.name")
+  )) %>%
+  # Add region by Our World in Data classification
+  left_join(
+    owid_region %>%
+      select("code", "owid_region" = "continent"),
+    by = c("iso3c" = "code")
+  ) %>%
+  # special case for Other nei
+  mutate(owid_region = case_when(
+    iso3c == "NEI" ~ "Other nei",
+    iso3c == "SCG" ~ "Europe",
+    TRUE ~ as.character(owid_region)
+  )) %>%
+  # Add continent by countrycode
+  mutate(continent = case_when(
+    iso3c == "NEI" ~ "Other nei",
+    iso3c == "SCG" ~ "Europe",
+    TRUE ~ countrycode(iso3c, origin = "iso3c", destination = "continent")
+  ))
+
+# Writing out results
+write.csv(countries, file.path(outdir, "countries.csv"), row.names = FALSE)
+
+################################################################################
 # Prepare and Combine all Snets created (min, mid, max)
+snet <- read.csv(file.path(snet_dir, "custom_ts/mid_custom_ts.csv"))
 
-snet_files <- list.files(path=datadir, pattern="artis_ts.csv")
+snet <- snet %>%
+  mutate(hs_version = as.character(hs_version)) %>%
+  mutate(hs_version = case_when(
+    str_length(hs_version) == 1 ~ paste("0", hs_version, sep=""),
+    TRUE ~ hs_version)) %>%
+  mutate(hs_version = paste("HS", hs_version, sep=""))
 
-snet <- data.frame()
-
-for (i in 1:length(snet_files)) {
-  curr_file <- snet_files[i]
-  curr_snet <- read.csv(file.path(datadir, curr_file))
-  
-  snet_type <- tolower(substring(curr_file, 1, 3))
-  
-  curr_snet <- curr_snet %>%
-    mutate(snet_est = snet_type) %>%
-    mutate(hs_version = as.character(hs_version)) %>%
-    mutate(hs_version = case_when(
-      str_length(hs_version) == 1 ~ paste("0", hs_version, sep=""),
-      TRUE ~ hs_version)) %>%
-    mutate(hs_version = paste("HS", hs_version, sep=""))
-  
-  snet <- snet %>%
-    bind_rows(curr_snet)
-}
+snet <- snet %>%
+  rename(sciname = SciName,
+         habitat = environment)
 
 write.csv(snet, file.path(outdir, "snet.csv"), row.names=FALSE)
 ################################################################################
+
