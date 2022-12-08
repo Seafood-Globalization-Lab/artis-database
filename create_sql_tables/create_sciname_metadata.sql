@@ -1,6 +1,7 @@
 
 CREATE TABLE sciname(
-    sciname VARCHAR(100) NOT NULL PRIMARY KEY,
+    record_id SERIAL NOT NULL PRIMARY KEY,
+    sciname VARCHAR(100) NOT NULL,
     common_name VARCHAR(255),
     genus VARCHAR(100),
     subfamily VARCHAR(100),
@@ -10,12 +11,5 @@ CREATE TABLE sciname(
     superclass VARCHAR(100),
     phylum VARCHAR(100),
     kingdom VARCHAR(100),
-    aquarium VARCHAR(100),
-    fresh BOOLEAN,
-    brack BOOLEAN,
-    saltwater BOOLEAN,
-    isscaap VARCHAR(100),
-    species_alpha_3_code VARCHAR(3),
-    species_taxonomic_code VARCHAR(100),
-    yearbook_group_en VARCHAR(100)
+    isscaap VARCHAR(100)
 );

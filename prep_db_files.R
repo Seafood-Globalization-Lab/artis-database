@@ -7,18 +7,16 @@ library(countrycode)
 rm(list=ls())
 
 # Directories and filenames
-datadir <- "/Volumes/jgephart/ARTIS/Outputs/model_inputs_20220926"
+datadir <- "/Volumes/jgephart/ARTIS/Outputs/model_inputs_20221129"
 clean_metadatadir <- "/Volumes/jgephart/ARTIS/Outputs/clean_metadata"
-snet_dir <- "/Volumes/jgephart/ARTIS/Outputs/snet_20220926"
-outdir <- "/Volumes/jgephart/ARTIS/Outputs/SQL_Database/20220928"
+snet_dir <- "/Volumes/jgephart/ARTIS/Outputs/S_net/snet_20221129"
+outdir <- "/Volumes/jgephart/ARTIS/Outputs/SQL_Database/20221129"
 
-# sciname_filename <- "sciname_metadata_original.csv"
-# isscaap_filename <- "sciname_isscaap_matches.csv"
 countries_filename <- "countries.csv"
 hs_codes_filename <- "All_HS_Codes.csv"
 prod_filename <- "standardized_fao_prod.csv"
 
-################################################################################
+#-------------------------------------------------------------------------------
 # Creating sciname table
 
 sciname <- read.csv(file.path(clean_metadatadir, "sciname_metadata.csv"))
@@ -27,7 +25,8 @@ sciname <- read.csv(file.path(clean_metadatadir, "sciname_metadata.csv"))
 sciname <- sciname %>%
   rename(isscaap = isscaap_group) %>%
   # rename(common_name = CommonName) %>%
-  rename(fresh = Fresh01, brack = Brack01, saltwater = Saltwater01)
+  rename(fresh = Fresh01, brack = Brack01, saltwater = Saltwater01) %>%
+  select(-c(fresh, brack, saltwater, Aquarium))
 
 # All column names lower case
 colnames(sciname) <- tolower(colnames(sciname))
@@ -35,12 +34,32 @@ colnames(sciname) <- tolower(colnames(sciname))
 # Writing out results
 write.csv(sciname, file.path(outdir, "sciname.csv"), row.names = FALSE)
 
-################################################################################
+#-------------------------------------------------------------------------------
+# Creating code max resolved taxa table
+code_max_resolved_taxa <- read.csv(file.path(clean_metadatadir, "code_max_resolved_taxa.csv"))
+
+code_max_resolved_taxa <- code_max_resolved_taxa %>%
+  mutate(hs_version = as.character(hs_version),
+         hs6 = as.character(hs6)) %>%
+  # Cleaning HS version
+  mutate(hs_version = case_when(
+    str_length(hs_version) == 1 ~ paste("0", hs_version, sep = ""),
+    TRUE ~ hs_version)) %>%
+  mutate(hs_version = paste("HS", hs_version, sep = "")) %>%
+  # Cleaning hs6 code
+  mutate(hs6 = case_when(
+    str_length(hs6) == 5 ~ paste("0", hs6, sep = ""),
+    TRUE ~ hs6
+  ))
+
+write.csv(code_max_resolved_taxa, file.path(outdir, "code_max_resolved.csv"), row.names = FALSE)
+
+#-------------------------------------------------------------------------------
 # Creating Product metadata table
 # hs codes, descriptions, FMFO status, product form
 
 # Read in list of HS codes found in K Drive Data folder
-products <- read.csv(file.path("/Volumes/jgephart/ARTIS/Data/", hs_codes_filename))
+products <- read.csv("/Volumes/jgephart/ARTIS/Data/All_HS_Codes.csv")
 
 products <- products %>%
   mutate(Code = as.character(Code)) %>%
@@ -88,12 +107,12 @@ names(products) <- tolower(names(products))
 # Writing out results
 write.csv(products, file.path(outdir, "products.csv"), row.names=FALSE)
 
-################################################################################
+#-------------------------------------------------------------------------------
 # Creating connecting table between sciname and products
 # Should contain Species, HS codes, liveweight cfs
 
 
-################################################################################
+#-------------------------------------------------------------------------------
 # Cleaning BACI data
 
 baci_files <- list.files(path=datadir, pattern="standardized_baci_seafood_hs", include.dirs=FALSE)
@@ -127,16 +146,16 @@ baci <- baci %>%
       # Use HS07 from 2010-2012 (inclusive)
       ((hs_version == "HS07") & (year >= 2010 & year <= 2012)) |
       # Use HS12 from 2013-2019 (inclusive)
-      ((hs_version == "HS12") & (year >= 2013 & year <= 2019))
+      ((hs_version == "HS12") & (year >= 2013 & year <= 2020))
   )
 
 write.csv(baci, file.path(outdir, "baci.csv"), row.names = FALSE)
 
-################################################################################
+#-------------------------------------------------------------------------------
 # Cleaning Production data
 
 # clean fao file found in Outputs/model_inputs on K Drive
-prod <- read.csv(file.path(datadir, prod_filename))
+prod <- read.csv(file.path(datadir, "standardized_fao_prod.csv"))
 
 # Filtering down to relevant columns (no duplications with other tables)
 prod <- prod %>%
@@ -151,7 +170,7 @@ prod <- prod %>%
 # Writing out results
 write.csv(prod, file.path(outdir, "prod.csv"), row.names=FALSE)
 
-################################################################################
+#-------------------------------------------------------------------------------
 # Creating Country metadata table
 
 # Create a country list based on production and BACI data (standardized countries)
@@ -191,21 +210,20 @@ countries <- countries %>%
 # Writing out results
 write.csv(countries, file.path(outdir, "countries.csv"), row.names = FALSE)
 
-################################################################################
+#-------------------------------------------------------------------------------
 # Prepare and Combine all Snets created (min, mid, max)
 snet <- read.csv(file.path(snet_dir, "custom_ts/mid_custom_ts.csv"))
 
 snet <- snet %>%
-  mutate(hs_version = as.character(hs_version)) %>%
-  mutate(hs_version = case_when(
-    str_length(hs_version) == 1 ~ paste("0", hs_version, sep=""),
-    TRUE ~ hs_version)) %>%
-  mutate(hs_version = paste("HS", hs_version, sep=""))
-
-snet <- snet %>%
+  mutate(hs_version = as.character(hs_version),
+         hs6 = as.character(hs6)) %>%
+  mutate(hs6 = case_when(
+    str_length(hs6) == 5 ~ paste("0", hs6, sep = ""),
+    TRUE ~ hs6
+  )) %>%
   rename(sciname = SciName,
          habitat = environment)
 
 write.csv(snet, file.path(outdir, "snet.csv"), row.names=FALSE)
-################################################################################
+#-------------------------------------------------------------------------------
 
