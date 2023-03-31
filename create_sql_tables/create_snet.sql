@@ -1,7 +1,7 @@
 CREATE TABLE snet(
     record_id SERIAL NOT NULL PRIMARY KEY,
-    exporter_iso3c VARCHAR(3),
     importer_iso3c VARCHAR(3),
+    exporter_iso3c VARCHAR(3),
     hs6 VARCHAR(6),
     product_weight_t FLOAT,
     dom_source VARCHAR(100),
