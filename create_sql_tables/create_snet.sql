@@ -9,7 +9,7 @@ CREATE TABLE snet(
     sciname VARCHAR(100),
     habitat VARCHAR(100),
     "method" VARCHAR(100),
+    live_weight_t FLOAT,
     hs_version VARCHAR(4),
-    "year" INT,
-    live_weight_t FLOAT
+    "year" INT
 );
