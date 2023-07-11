@@ -11,5 +11,6 @@ CREATE TABLE complete_consumption(
   consumption_live_t FLOAT,
   source_country_iso3c VARCHAR(7),
   dom_source VARCHAR(8),
-  hs_version VARCHAR(4)
+  hs_version VARCHAR(4),
+  population INTEGER
 )
