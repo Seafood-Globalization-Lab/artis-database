@@ -15,7 +15,7 @@ CREATE TABLE sciname(
     species_identifier VARCHAR(100),
     species_taxonomic_code VARCHAR(100),
     species_alpha3_code VARCHAR(100),
-    appendix VARCHAR(3),
+    cites_appendix VARCHAR(3),
     cites_effective_date VARCHAR(100),
-    redlist_category VARCHAR(100)
+    iucn_redlist_category VARCHAR(100)
 );
