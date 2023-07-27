@@ -3,6 +3,12 @@ library(tidyverse)
 library(DBI)
 library(RPostgres)
 
+# Note: make sure to have a .Renviron file has the arguments
+  # DB_NAME, DB_PORT, DB_USERNAME, DB_PASSWORD
+  # if you just created the .Renviron file for the first time please restart your R session
+
+# open connection to database
+# Note: always close the connection after making all calls to the database (dbDisconnect(con))
 con <- dbConnect(RPostgres::Postgres(),
                  host="localhost",
                  dbname=Sys.getenv("DB_NAME"),
@@ -10,57 +16,61 @@ con <- dbConnect(RPostgres::Postgres(),
                  user=Sys.getenv("DB_USERNAME"),
                  password=Sys.getenv("DB_PASSWORD"))
 
+# list all tables in the
 dbListTables(con)
 
-snet <- dbGetQuery(con,
-                       'SELECT hs_version, "year", snet_est, SUM(live_weight_t), sum(product_weight_t)
-                       FROM snet
-                       GROUP BY hs_version, "year", snet_est'
-                       )
+# Examples
 
-baci <- dbGetQuery(con,
-                   'SELECT hs_version, "year", SUM(product_weight_t) AS product_weight_t
-                   FROM baci
-                   GROUP BY hs_version, "year"'
-                   )
+# Get whole tables--------------------------------------------------------------
+# Get whole ARTIS disaggregated trade table
+artis <- dbGetQuery(con, 'SELECT * FROM snet')
 
+# Get whole production table (FAO Production data used to build the ARTIS disaggregated trade table)
+fao_production <- dbGetQuery(con, 'SELECT * FROM production')
+
+# Get whole SAU production table (NOT used to build the ARTIS disaggregated trade table)
+sau_production <- dbGetQuery(con, 'SELECT * FROM sau_production')
+
+# Get taxonomic hierarchy for taxa in ARTIS table
+sciname_metadata <- dbGetQuery(con, 'SELECT * FROM sciname')
+
+# Get whole BACI bilateral trade records (these trade records are used to build the ARTIS disaggregated trade table)
+baci <- dbGetQuery(con, 'SELECT * FROM baci')
+
+# Get whole table of HS product code metadata (ie HS code, hs version, descriptions, etc)
+products <- dbGetQuery(con, 'SELECT * FROM products')
+
+# Get whole table of consumption
+consumption <- dbGetQuery(con, 'SELECT * FROM complete_consumption')
+
+# Get metadata for countries (ISO3 codes, country names, regions, etc)
+country_metadata <- dbGetQuery(con, 'SELECT * FROM countries')
+
+# Get whole nutrient data
+nutrient_metadata <- dbGetQuery(con, 'SELECT * FROM nutrient_metadata')
+
+# Get a conversion table from higher order taxonomic names to more specific species names
+code_max_resolved_taxa <- dbGetQuery(con, 'SELECT * FROM code_max_resolved_taxa')
+
+
+# Get filtered version of tables------------------------------------------------
+# Get all production data where Peru is the producer
+prod_filtered <- dbGetQuery(con, 'SELECT * FROM production WHERE iso3c = "PER"')
+# Get all production data where Peru is the producer and the year is 2018
+prod_filtered_2 <- dbGetQuery(con, 'SELECT * FROM production WHERE iso3c = "PER" AND year = 2018')
+
+# Get summarized version of tables----------------------------------------------
+
+# Get the estimates for product weights and live weights for all trade by year
+artis_summarized <- dbGetQuery(con,
+                               'SELECT SUM(product_weight_t), sum(live_weight_t), year FROM snet
+                               GROUP BY year')
+# Get estimates for live weight by year for all trade from China to the USA
+artis_summarized_filtered <- dbGetQuery(con,
+                                        'SELECT SUM(live_weight_t), year
+                                        FROM snet WHERE exporter_iso3c = "CHN" AND importer_iso3c = "USA')
+
+# close connection to database
 dbDisconnect(con)
 
-snet <- snet %>%
-  rename(live_weight_t = sum, product_weight_t = sum..5) %>%
-  mutate(hs_version = as.character(hs_version)) %>%
-  mutate(hs_version = case_when(
-    str_length(hs_version) == 1 ~ paste("0", hs_version, sep=""),
-    TRUE ~ hs_version
-  )) %>%
-  mutate(hs_version = paste("HS", hs_version, sep=""))
 
-baci <- baci %>%
-  mutate(snet_est = "baci")
-
-snet <- snet %>%
-  full_join(baci)
-
-p <- snet %>%
-  filter(snet_est == "baci" | snet_est == "max") %>%
-  ggplot(aes(x=year, y=product_weight_t, colour=hs_version, linetype=snet_est, group=interaction(hs_version, snet_est))) +
-  geom_line()
-
-plot(p)
-
-custom_snet <- snet %>%
-  filter(
-    ((hs_version == "HS96") & (year <= 2003)) |
-      # Use HS02 from 2004-2009 (inclusive)
-      ((hs_version == "HS02") & (year >= 2004 & year <= 2009)) |
-      # Use HS07 from 2010-2012 (inclusive)
-      ((hs_version == "HS07") & (year >= 2010 & year <= 2012)) |
-      # Use HS12 from 2013-2019 (inclusive)
-      ((hs_version == "HS12") & (year >= 2013 & year <= 2019))
-  )
-  
-p_custom <- custom_snet %>%
-  ggplot(aes(x=year, y=product_weight_t, colour=snet_est, group=snet_est)) +
-  geom_line()
-
-plot(p_custom)
