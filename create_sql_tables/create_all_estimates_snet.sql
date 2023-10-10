@@ -1,9 +1,9 @@
 CREATE TABLE all_estimates_snet(
     record_id SERIAL NOT NULL PRIMARY KEY,
     "year" INT,
-    source_country_iso3c VARCHAR(3),
+    source_country_iso3c VARCHAR(7),
     exporter_iso3c VARCHAR(3),
-    importer_i(so3c VARCHAR(3),
+    importer_iso3c VARCHAR(3),
     hs6 VARCHAR(6),
     hs_version VARCHAR(4),
     dom_source VARCHAR(100),
