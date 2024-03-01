@@ -13,5 +13,5 @@ CREATE TABLE complete_consumption(
   method VARCHAR(11),
   consumption_source VARCHAR(8),
   sciname_hs_modified VARCHAR(33),
-  consumption_t FLOAT
+  consumption_live_t FLOAT
 )
