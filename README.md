@@ -61,6 +61,36 @@ The details needed to fill in the following information can be found on the Hero
 5. Run the SQL command "SELECT * FROM users;" (this should return immediately, with a table of the users that have access to the ARTIS API)
 
 
+### Add new data to cloud database
+1. Find the tables drop down under the database connection options on the left hand side of pgAdmin
+![](./documentation/images/pgAdmin_tables_dropdown.png)
+
+Repeat the following instructions for each table you want to update:
+
+1. If the table already exists:
+ - Right click on the existing table and select the "Delete/Drop" option
+ ![](./documentation/images/pgAdmin_delete_table.png)
+ 
+2. Right-click on the database name in drop down options
+3. Select the "Query tool" option (this should open a window in pgAdmin)
+4. Paste and run the SQL script for creating the table you are interested in updating
+5. Right-click the "Tables" dropdown and select "Refresh"
+![](./documentation/images/pgAdmin_tables_refresh.png)
+
+6. Right-click on the table you just re-created, and select "Import/Export Data" (this will open a new dialog box)
+![](./documentation/images/pgAdmin_table_import.png)
+
+7. Confirm the "Import" tab is selected and use the "Filename" field to find the table data you would like to include.
+![](./documentation/images/pgAdmin_import_general.png)
+
+9. Select the "Options" tab
+8. Confirm the "Header" toggle is activated and the "NULL Strings" field has the value "NA"
+![](./documentation/images/pgAdmin_import_options.png)
+
+9. Select the "Columns" tab
+10. Make sure the "record_id" column IS NOT part of the "Columns to import" field. If it is please delete this column from the list.
+![](./documentation/images/pgAdmin_import_columns.png)
+
 ## Directory and File Structure
 
 - prep_db_files.R
