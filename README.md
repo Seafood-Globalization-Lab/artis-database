@@ -1,9 +1,65 @@
 # ARTIS Database
 
-# Installations
+## Installations
 
 1. Download PostgreSQL: https://www.postgresql.org/download/
 2. Download pgAdmin: https://www.pgadmin.org/download/
+
+## Updating Cloud (Heroku) Database
+*Reference: https://stackoverflow.com/questions/11769860/connect-to-a-heroku-database-with-pgadmin*
+
+### Gathering Heroku database credentials:
+
+1. Sign into the [Heroku platform](https://www.heroku.com/)
+2. Click on the "artis" app
+
+![](./documentation/images/heroku_artis_app_page.png)
+
+3. Click on the "Resources" tab
+![](./documentation/images/heroku_resources_page.png)
+4. Click on "Heroku Postgres" in the list of resources available (this should open a new browser tab)
+![](./documentation/images/heroku_postgres.png)
+5. Click on the "Credentials" tab
+![](./documentation/images/heroku_postgres_credentials_page.png)
+6. Click on the arrow by "default 1 app" (this should provide a drop down set of options and details)
+7. Click on the "show" button to reveal the password for the database
+
+### Creating a connection between the Heroku Database and pgadmin:
+
+1. Open pgAdmin
+2. Right click on the Server list on the left hand side
+3. Select Servers > Register > Server (this will open a new smaller window with additional settings)
+![](./documentation/images/pgAdmin_connect_server.png)
+
+4. Enter a server name (this will only be a local name reference) like "HEROKU_ARTIS"
+![](./documentation/images/pgAdmin_connect_server_general.png)
+
+5. Click on the "Connection" tab
+![](./documentation/images/pgAdmin_connection_tab.png)
+The details needed to fill in the following information can be found on the Heroku credentials page we found earlier:
+
+6. Enter the host name under the "Host name/address"
+7. Enter the port number under the "Port" field
+8. Enter the database name under the "Maintenance database" field
+9. Enter the user name under the "Username" field
+10. Enter the password (make sure to click reveal in Heroku) under the "Password"
+11. Select Save password for future use
+12. Click on "Advanced" tab
+![](./documentation/images/pgAdmin_connection_advanced_tab.png)
+
+13. Enter the database name under the "DB restriction" field
+(There should now be a new database connection in your pgAdmin dropdown)
+
+### Test connection to Heroku database:
+1. Click on server connection you created earlier (this will appear under the server name you wrote in earlier, ie "HEROKU_ARTIS")
+2. Click the arrow by the server connection name (this should create provide a drop down with options and the 1 database)
+3. Right-click on the database name in drop down options
+4. Select the "Query tool" option (this should open a window in pgAdmin)
+![](./documentation/images/pgAdmin_query_tool.png)
+
+
+5. Run the SQL command "SELECT * FROM users;" (this should return immediately, with a table of the users that have access to the ARTIS API)
+
 
 ## Directory and File Structure
 
