@@ -1,6 +1,6 @@
 
 
-CREATE TABLE complete_consumption(
+CREATE TABLE consumption(
   record_id SERIAL NOT NULL PRIMARY KEY,
   year INTEGER,
   hs_version VARCHAR(4),
