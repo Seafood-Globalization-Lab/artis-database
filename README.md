@@ -23,7 +23,7 @@
 </p>
 5. Click on the "Credentials" tab
 <p align="center">
-  <img src="./images/heroku_postgres_credentials_page.png" alt="drawing" width="75%"/>
+  <img src="./images/heroku_postgres_credentials_page.png" alt="drawing" width="50%"/>
 </p>
 6. Click on the arrow by "default 1 app" (this should provide a drop down set of options and details)
 7. Click on the "show" button to reveal the password for the database
@@ -34,7 +34,7 @@
 2. Right click on the Server list on the left hand side
 3. Select Servers > Register > Server (this will open a new smaller window with additional settings)
 <p align="center">
-  <img src="./images/pgAdmin_connect_server.png" alt="drawing" width="75%"/>
+  <img src="./images/pgAdmin_connect_server.png" alt="drawing" width="50%"/>
 </p>
 
 4. Enter a server name (this will only be a local name reference) like "HEROKU_ARTIS"
@@ -68,7 +68,7 @@ The details needed to fill in the following information can be found on the Hero
 3. Right-click on the database name in drop down options
 4. Select the "Query tool" option (this should open a window in pgAdmin)
 <p align="center">
-  <img src="./images/pgAdmin_query_tool.png" alt="drawing" width="50%"/>
+  <img src="./images/pgAdmin_query_tool.png" alt="drawing" width="30%"/>
 </p>
 
 
@@ -77,33 +77,47 @@ The details needed to fill in the following information can be found on the Hero
 
 ### Add new data to cloud database
 1. Find the tables drop down under the database connection options on the left hand side of pgAdmin
-![](./images/pgAdmin_tables_dropdown.png)
+<p align="center">
+  <img src="./images/pgAdmin_tables_dropdown.png" alt="drawing" width="30%"/>
+</p>
 
 Repeat the following instructions for each table you want to update:
 
 1. If the table already exists:
  - Right click on the existing table and select the "Delete/Drop" option
- ![](./images/pgAdmin_delete_table.png)
+<p align="center">
+  <img src="./images/pgAdmin_delete_table.png" alt="drawing" width="30%"/>
+</p>
  
 2. Right-click on the database name in drop down options
 3. Select the "Query tool" option (this should open a window in pgAdmin)
 4. Paste and run the SQL script for creating the table you are interested in updating
 5. Right-click the "Tables" dropdown and select "Refresh"
-![](./images/pgAdmin_tables_refresh.png)
+<p align="center">
+  <img src="./images/pgAdmin_tables_refresh.png" alt="drawing" width="30%"/>
+</p>
 
 6. Right-click on the table you just re-created, and select "Import/Export Data" (this will open a new dialog box)
-![](./images/pgAdmin_table_import.png)
+<p align="center">
+  <img src="./images/pgAdmin_table_import.png" alt="drawing" width="30%"/>
+</p>
 
 7. Confirm the "Import" tab is selected and use the "Filename" field to find the table data you would like to include.
-![](./images/pgAdmin_import_general.png)
+<p align="center">
+  <img src="./images/pgAdmin_import_general.png" alt="drawing" width="50%"/>
+</p>
 
-9. Select the "Options" tab
-8. Confirm the "Header" toggle is activated and the "NULL Strings" field has the value "NA"
-![](./images/pgAdmin_import_options.png)
+8. Select the "Options" tab
+9. Confirm the "Header" toggle is activated and the "NULL Strings" field has the value "NA"
+<p align="center">
+  <img src="./images/pgAdmin_import_options.png" alt="drawing" width="50%"/>
+</p>
 
-9. Select the "Columns" tab
-10. Make sure the "record_id" column IS NOT part of the "Columns to import" field. If it is please delete this column from the list.
-![](./images/pgAdmin_import_columns.png)
+10. Select the "Columns" tab
+11. Make sure the "record_id" column IS NOT part of the "Columns to import" field. If it is please delete this column from the list.
+<p align="center">
+  <img src="./images/pgAdmin_import_columns.png" alt="drawing" width="50%"/>
+</p>
 
 ## Directory and File Structure
 
