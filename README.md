@@ -36,12 +36,10 @@
 <p align="center">
   <img src="./images/pgAdmin_connect_server.png" alt="drawing" width="50%"/>
 </p>
-
 4. Enter a server name (this will only be a local name reference) like "HEROKU_ARTIS"
 <p align="center">
   <img src="./images/pgAdmin_connect_server_general.png" alt="drawing" width="50%"/>
 </p>
-
 5. Click on the "Connection" tab
 <p align="center">
   <img src="./images/pgAdmin_connection_tab.png" alt="drawing" width="50%"/>
@@ -58,7 +56,6 @@ The details needed to fill in the following information can be found on the Hero
 <p align="center">
   <img src="./images/pgAdmin_connection_advanced_tab.png" alt="drawing" width="50%"/>
 </p>
-
 13. Enter the database name under the "DB restriction" field
 (There should now be a new database connection in your pgAdmin dropdown)
 
@@ -70,10 +67,7 @@ The details needed to fill in the following information can be found on the Hero
 <p align="center">
   <img src="./images/pgAdmin_query_tool.png" alt="drawing" width="30%"/>
 </p>
-
-
 5. Run the SQL command "SELECT * FROM users;" (this should return immediately, with a table of the users that have access to the ARTIS API)
-
 
 ### Add new data to cloud database
 1. Find the tables drop down under the database connection options on the left hand side of pgAdmin
@@ -88,7 +82,6 @@ Repeat the following instructions for each table you want to update:
 <p align="center">
   <img src="./images/pgAdmin_delete_table.png" alt="drawing" width="30%"/>
 </p>
- 
 2. Right-click on the database name in drop down options
 3. Select the "Query tool" option (this should open a window in pgAdmin)
 4. Paste and run the SQL script for creating the table you are interested in updating
@@ -96,23 +89,19 @@ Repeat the following instructions for each table you want to update:
 <p align="center">
   <img src="./images/pgAdmin_tables_refresh.png" alt="drawing" width="30%"/>
 </p>
-
 6. Right-click on the table you just re-created, and select "Import/Export Data" (this will open a new dialog box)
 <p align="center">
   <img src="./images/pgAdmin_table_import.png" alt="drawing" width="30%"/>
 </p>
-
 7. Confirm the "Import" tab is selected and use the "Filename" field to find the table data you would like to include.
 <p align="center">
   <img src="./images/pgAdmin_import_general.png" alt="drawing" width="50%"/>
 </p>
-
 8. Select the "Options" tab
 9. Confirm the "Header" toggle is activated and the "NULL Strings" field has the value "NA"
 <p align="center">
   <img src="./images/pgAdmin_import_options.png" alt="drawing" width="50%"/>
 </p>
-
 10. Select the "Columns" tab
 11. Make sure the "record_id" column IS NOT part of the "Columns to import" field. If it is please delete this column from the list.
 <p align="center">
