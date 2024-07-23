@@ -18,9 +18,13 @@
 3. Click on the "Resources" tab
 ![](./images/heroku_resources_page.png)
 4. Click on "Heroku Postgres" in the list of resources available (this should open a new browser tab)
-![](./images/heroku_postgres.png)
+<p align="center">
+  <img src="./images/heroku_postgres.png" alt="drawing" width="75%"/>
+</p>
 5. Click on the "Credentials" tab
-![](./images/heroku_postgres_credentials_page.png)
+<p align="center">
+  <img src="./images/heroku_postgres_credentials_page.png" alt="drawing" width="75%"/>
+</p>
 6. Click on the arrow by "default 1 app" (this should provide a drop down set of options and details)
 7. Click on the "show" button to reveal the password for the database
 
@@ -29,13 +33,19 @@
 1. Open pgAdmin
 2. Right click on the Server list on the left hand side
 3. Select Servers > Register > Server (this will open a new smaller window with additional settings)
-![](./images/pgAdmin_connect_server.png)
+<p align="center">
+  <img src="./images/pgAdmin_connect_server.png" alt="drawing" width="75%"/>
+</p>
 
 4. Enter a server name (this will only be a local name reference) like "HEROKU_ARTIS"
-![](./images/pgAdmin_connect_server_general.png)
+<p align="center">
+  <img src="./images/pgAdmin_connect_server_general.png" alt="drawing" width="50%"/>
+</p>
 
 5. Click on the "Connection" tab
-![](./images/pgAdmin_connection_tab.png)
+<p align="center">
+  <img src="./images/pgAdmin_connection_tab.png" alt="drawing" width="50%"/>
+</p>
 The details needed to fill in the following information can be found on the Heroku credentials page we found earlier:
 
 6. Enter the host name under the "Host name/address"
@@ -45,7 +55,9 @@ The details needed to fill in the following information can be found on the Hero
 10. Enter the password (make sure to click reveal in Heroku) under the "Password"
 11. Select Save password for future use
 12. Click on "Advanced" tab
-![](./images/pgAdmin_connection_advanced_tab.png)
+<p align="center">
+  <img src="./images/pgAdmin_connection_advanced_tab.png" alt="drawing" width="50%"/>
+</p>
 
 13. Enter the database name under the "DB restriction" field
 (There should now be a new database connection in your pgAdmin dropdown)
@@ -55,7 +67,9 @@ The details needed to fill in the following information can be found on the Hero
 2. Click the arrow by the server connection name (this should create provide a drop down with options and the 1 database)
 3. Right-click on the database name in drop down options
 4. Select the "Query tool" option (this should open a window in pgAdmin)
-![](./images/pgAdmin_query_tool.png)
+<p align="center">
+  <img src="./images/pgAdmin_query_tool.png" alt="drawing" width="50%"/>
+</p>
 
 
 5. Run the SQL command "SELECT * FROM users;" (this should return immediately, with a table of the users that have access to the ARTIS API)
