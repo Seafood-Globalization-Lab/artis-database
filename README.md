@@ -1,4 +1,14 @@
-# ARTIS Database
+# Configuring cloud and local ARTIS databases
+
+Instructions for seting up and managing cloud and local instances of the ARTIS database.
+
+- [Installations](#Installations)
+- [Cloud Database](# Updating Cloud (Heroku) Database)
+- [Local Database](# Setting up local database)
+- [Architecture](# Directory and File Structure)
+- [Database Structure](# Database Structure)
+
+**NOTE** We are migrating our cloud database from Heroku to Vercel and will update these instructions (2024-07-26)
 
 ## Installations
 
@@ -6,6 +16,7 @@
 2. Download pgAdmin: https://www.pgadmin.org/download/
 
 ## Updating Cloud (Heroku) Database
+
 *Reference: https://stackoverflow.com/questions/11769860/connect-to-a-heroku-database-with-pgadmin*
 
 ### Gathering Heroku database credentials:
@@ -28,7 +39,9 @@
 6. Click on the arrow by "default 1 app" (this should provide a drop down set of options and details)
 7. Click on the "show" button to reveal the password for the database
 
-### Creating a connection between the Heroku Database and pgadmin:
+## Setting up local database
+
+### Create a connection between the Heroku Database and local pgadmin:
 
 1. Open pgAdmin
 2. Right click on the Server list on the left hand side
