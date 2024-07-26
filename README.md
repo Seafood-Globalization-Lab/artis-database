@@ -2,13 +2,13 @@
 
 Instructions for seting up and managing cloud and local instances of the ARTIS database.
 
-- [Installations](#Installations)
-- [Cloud Database](# Updating Cloud (Heroku) Database)
-- [Local Database](# Setting up local database)
-- [Architecture](# Directory and File Structure)
-- [Database Structure](# Database Structure)
+- [1) Installations](#installations)
+- [2) Cloud Database](#updating-cloud-heroku-database)
+- [3) Local Database](#setting-up-local-database)
+- [4) Architecture](#directory-and-file-structure)
+- [5) Database Structure](#database-structure)
 
-**NOTE** We are migrating our cloud database from Heroku to Vercel and will update these instructions (2024-07-26)
+**Please Note:** We are migrating our cloud database from Heroku to Vercel and will update these instructions (2024-07-26)
 
 ## Installations
 
