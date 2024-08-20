@@ -5,6 +5,8 @@ Instructions for seting up and managing cloud and local instances of the ARTIS d
 - [Installations](#installations)
 - [Cloud Database](#updating-cloud-heroku-database)
 - [Local Database](#setting-up-local-database)
+  - [Connect Heroku and Local Database](#create-a-connection-between-the-heroku-database-and-local-pgadmin)
+  - [Add new data to local database](add-new-data-to-local-database)
 - [Architecture](#directory-and-file-structure)
 - [Database Structure](#database-structure)
 
@@ -82,7 +84,7 @@ The details needed to fill in the following information can be found on the Hero
 </p>
 5. Run the SQL command "SELECT * FROM users;" (this should return immediately, with a table of the users that have access to the ARTIS API)
 
-### Add new data to cloud database
+### Add new data to local database
 1. Find the tables drop down under the database connection options on the left hand side of pgAdmin
 <p align="center">
   <img src="./images/pgAdmin_tables_dropdown.png" alt="drawing" width="30%"/>
