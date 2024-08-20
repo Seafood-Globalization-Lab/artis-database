@@ -94,31 +94,42 @@ Repeat the following instructions for each table you want to update:
 
 1. If the table already exists:
  - Right click on the existing table and select the "Delete/Drop" option
+   
 <p align="center">
   <img src="./images/pgAdmin_delete_table.png" alt="drawing" width="30%"/>
 </p>
+
 2. Right-click on the database name in drop down options
 3. Select the "Query tool" option (this should open a window in pgAdmin)
 4. Paste and run the SQL script for creating the table you are interested in updating
 5. Right-click the "Tables" dropdown and select "Refresh"
+
 <p align="center">
   <img src="./images/pgAdmin_tables_refresh.png" alt="drawing" width="30%"/>
 </p>
+
 6. Right-click on the table you just re-created, and select "Import/Export Data" (this will open a new dialog box)
+
 <p align="center">
   <img src="./images/pgAdmin_table_import.png" alt="drawing" width="30%"/>
 </p>
+
 7. Confirm the "Import" tab is selected and use the "Filename" field to find the table data you would like to include.
+
 <p align="center">
   <img src="./images/pgAdmin_import_general.png" alt="drawing" width="50%"/>
 </p>
+
 8. Select the "Options" tab
 9. Confirm the "Header" toggle is activated and the "NULL Strings" field has the value "NA"
+
 <p align="center">
   <img src="./images/pgAdmin_import_options.png" alt="drawing" width="50%"/>
 </p>
+
 10. Select the "Columns" tab
 11. Make sure the "record_id" column IS NOT part of the "Columns to import" field. If it is please delete this column from the list.
+
 <p align="center">
   <img src="./images/pgAdmin_import_columns.png" alt="drawing" width="50%"/>
 </p>
