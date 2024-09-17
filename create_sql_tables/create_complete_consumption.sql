@@ -7,12 +7,13 @@ CREATE TABLE consumption(
   source_country_iso3c VARCHAR(7),
   exporter_iso3c VARCHAR(3),
   consumer_iso3c VARCHAR(3),
-  dom_source VARCHAR(8),
   sciname VARCHAR(33),
+  sciname_hs_modified VARCHAR(33),
   habitat VARCHAR(7),
   method VARCHAR(11),
-  consumption_source VARCHAR(8),
-  sciname_hs_modified VARCHAR(33),
-  consumption_live_t FLOAT,
-  org_consumption_live_t FLOAT
+  dom_source VARCHAR(8),
+  consumption_type VARCHAR(8),
+  end_use VARCHAR(24),
+  consumption_t FLOAT,
+  consumption_t_capped FLOAT
 )
