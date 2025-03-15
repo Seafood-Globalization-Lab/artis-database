@@ -7,3 +7,4 @@
 *.Rproj
 data/
 outputs/
+AM_local/

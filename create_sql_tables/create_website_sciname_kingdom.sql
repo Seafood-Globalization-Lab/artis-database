@@ -6,7 +6,7 @@ CREATE TABLE artis_kingdom(
     product_weight_t FLOAT,
     dom_source VARCHAR(100),
     source_country_iso3c VARCHAR(7),
-    kingdom VARCHAR(100),
+    sciname VARCHAR(100),
     habitat VARCHAR(100),
     "method" VARCHAR(100),
     live_weight_t FLOAT,
