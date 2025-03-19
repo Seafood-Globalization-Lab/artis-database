@@ -1,4 +1,4 @@
-CREATE TABLE artis_superclass(
+CREATE TABLE snet_superclass(
     record_id SERIAL NOT NULL PRIMARY KEY,
     importer_iso3c VARCHAR(3),
     exporter_iso3c VARCHAR(3),

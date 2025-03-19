@@ -1,4 +1,4 @@
-CREATE TABLE artis_kingdom(
+CREATE TABLE snet_kingdom(
     record_id SERIAL NOT NULL PRIMARY KEY,
     importer_iso3c VARCHAR(3),
     exporter_iso3c VARCHAR(3),
