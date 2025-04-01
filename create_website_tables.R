@@ -4,7 +4,6 @@
 # Github Issue: https://github.com/Seafood-Globalization-Lab/artis-model/issues/43
 # created: 2025-01-13
 # author: Althea Marks
-# notes: This script needs some cleaning up. But hopefully will provide context to the website database workflow if I don't get around to documenting it properly.
 
 # Setup -------------------------------------------------------------------
 library(dplyr)
@@ -160,7 +159,20 @@ web_sciname_clean <- web_sciname %>%
 fwrite(web_sciname_clean, file.path(outdir_website,
                                     "sciname_website_2025_01_27.csv"))
 
+# Fix missing superclass problem -----------------------------------------
+web_sciname_3 <- fread(file.path(outdir_website,
+                                 "sciname_website_2025_03_19.csv")) %>% 
+  mutate_all(~na_if(.,""))
 
+web_sciname_3 <- web_sciname_3 %>% 
+  mutate(superclass = case_when(class == "actinopterygii" & 
+                                  is.na(superclass) ~ "osteichthyes", 
+                                TRUE ~ superclass
+  ))
+
+sciname_testing <- web_sciname_3
+
+fwrite(web_sciname_3, file.path(outdir_website, "sciname_website_2025_03_31.csv"))
 # Test sciname table ------------------------------------------------------
 
 # Not confident in the creation of sciname table. Spot checks here will insure 
@@ -168,7 +180,7 @@ fwrite(web_sciname_clean, file.path(outdir_website,
 # artis for the purposes of summarizing trade by a specific taxa rank name
 
 # read in sciname table created above
-sciname_web <- fread(file.path(outdir_website,"sciname_website_2025_01_27.csv"))
+sciname_web <- fread(file.path(outdir_website,"sciname_website_2025_03_31.csv"))
 sciname_web <- sciname_web %>% 
   mutate_all(~na_if(.,""))
 
@@ -177,7 +189,8 @@ sciname_web <- sciname_web %>%
 #   filter(is.na(common_name))
 # fwrite(missing_common, file.path(outdir_website, "sciname_missing_common_names_2025_03_17.csv"))
 
-test_sciname <- sciname_new
+# change right hand side based if needed
+test_sciname <- sciname_web
 
 sciname_testing <- test_sciname %>% 
   mutate(
@@ -277,6 +290,12 @@ if(sum(sciname_testing$diff_test != 0, na.rm = TRUE) > 0){
   cli::cli_inform(c("Test PASSED -- all expected sciname taxa rank values present."))
 }
 
+### Test if all actinopterygii records contain a superclass value
+if(nrow(sciname_testing %>% 
+        filter(class == "actinopterygii" & is.na(superclass))) == 0){
+  message("All `actinopterygii` rows have a superclass value - test passed")
+} else( 
+  message("Superclass NAs present for `actinopterygii` class values - this is a problem for the website"))
 
 # Notes - corrections needed
 # 1) sciname == hippoglossinae - was the manually added taxa classification - not found by worms. 
@@ -329,7 +348,7 @@ fwrite(sciname_new, file.path(outdir_website, "sciname_website_2025_03_19.csv"))
 # when I read artis into memory and ran this summary. 
 
 # read in sciname table created above
-sciname_web <- fread(file.path(outdir_website,"sciname_website_2025_03_19.csv"))
+sciname_web <- fread(file.path(outdir_website,"sciname_website_2025_03_31.csv"))
 
 # fill in empty cells with NAs
 sciname_web <- sciname_web %>% 
@@ -353,7 +372,7 @@ dbGetQuery(con, "SHOW TABLES")
 
 # Create function to use duckdb tables to run by taxa rank summaries and write out to local .csv
 
-# yes I am lazy and relying on global environment variables not as arguements
+# yes I am lazy and relying on global environment variables not as arguments
 artis_by_taxa_rank <- function(taxa_rank_col){
   # create query object
   result <- tbl(con, "tbl_artis") %>% 
@@ -370,25 +389,29 @@ artis_by_taxa_rank <- function(taxa_rank_col){
         # Use HS12 from 2013-2020 (inclusive)
         ((hs_version == "HS12") & (year >= 2013 & year <= 2020))
     ) %>% 
-    left_join(tbl(con, "tbl_sciname") %>% 
-                select(sciname, taxa_rank_col) %>% 
-                filter(!is.na(.data[[taxa_rank_col]])), # remove NA is taxa rank column
-              by = "sciname") %>% 
+    inner_join(tbl(con, "tbl_sciname") %>% 
+                 select(sciname, taxa_rank_col) %>% 
+                 filter(!is.na(.data[[taxa_rank_col]])), # remove NA is taxa rank column
+               by = "sciname") %>% 
+    # drops sciname column to summarize by taxa rank name
     group_by(.data[[taxa_rank_col]], importer_iso3c, exporter_iso3c, hs6, 
              dom_source, source_country_iso3c, habitat, method, hs_version, year) %>% 
     summarise(live_weight_t = sum(live_weight_t),
               product_weight_t = sum(product_weight_t),
               .groups = "drop") %>% 
+    # the taxa rank col values are now the sciname values
     rename(sciname = taxa_rank_col) %>% 
+    # record what taxa rank level data is summarized at
+    mutate(taxa_rank = taxa_rank_col) %>% 
     select(importer_iso3c, exporter_iso3c, hs6, product_weight_t, dom_source,
            source_country_iso3c, sciname, habitat, method, live_weight_t, 
-           hs_version, year)
+           hs_version, year, taxa_rank)
   
   # run query and write result as table in duckdb
   result %>% compute(glue("tbl_artis_{taxa_rank_col}"), temporary = TRUE)
   
   # write duckdb table out as local csv
-  dbExecute(con, glue("COPY tbl_artis_{taxa_rank_col} TO '{outdir_website}/artis_{taxa_rank_col}_website_{Sys.Date()}.csv' WITH (HEADER, DELIMITER ',')"))
+  # dbExecute(con, glue("COPY tbl_artis_{taxa_rank_col} TO '{outdir_website}/artis_{taxa_rank_col}_website_{Sys.Date()}.csv' WITH (HEADER, DELIMITER ',')"))
 }
 
 taxa_ranks <- c("genus", "subfamily", "family", "order", "class", "superclass",
@@ -397,12 +420,51 @@ taxa_ranks <- c("genus", "subfamily", "family", "order", "class", "superclass",
 # run as single chunk
 {
   timestart <- Sys.time()
+  # run function across all taxa ranks, and combine resulting df into single df
   map(taxa_ranks, ~ artis_by_taxa_rank(.x))
   timeend <- Sys.time()
   timeend - timestart
+  dbGetQuery(con, "SHOW TABLES")
   beepr::beep()
 }
+
+# create vector of taxa rank table names
+tbl_names <- map_chr(taxa_ranks, ~ glue("tbl_artis_{.x}"))
+
+# Check number of rows
+tbl_tally <- map_vec(tbl_names, ~ tbl(con, {.x}) %>% 
+                       tally() %>% 
+                       pull(n))
+# total number of rows - check when combine tables
+sum(tbl_tally)
+
+# create blank table using schema from an existing table
+dbGetQuery(con, "CREATE TABLE tbl_artis_taxa_sum AS
+                  FROM tbl_artis_genus LIMIT 0;")
+# check the new table
+dbGetQuery(con, "DESCRIBE tbl_artis_taxa_sum")
+
+# bind each table in tbl_names into new table
+walk(tbl_names, function(tbl_name){
+  sql <- glue("INSERT INTO tbl_artis_taxa_sum SELECT * FROM {tbl_name};")
+  dbExecute(con, sql)
+})
+
+# check out results
 dbGetQuery(con, "SHOW TABLES")
+glimpse(tbl(con, "tbl_artis_taxa_sum"))
+tbl(con, "tbl_artis_taxa_sum") %>% select(taxa_rank) %>% distinct()
+
+new_tbl_tally <- tbl(con, "tbl_artis_taxa_sum") %>% 
+  tally() %>% 
+  pull(n)
+# check if tallys add up
+sum(tbl_tally) == new_tbl_tally
+
+# write out new combined table
+dbExecute(con, glue("COPY tbl_artis_taxa_sum TO '{outdir_website}/artis_taxa_sum_website_{Sys.Date()}.csv' WITH (HEADER, DELIMITER ',')"))
+
+
 # RESULT NOTES
 # Time difference of 4.571202 mins! and did my RAM usage was at 80%, no crashing!
 # ~ 6 mins with 8 tables
