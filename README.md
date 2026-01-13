@@ -1,5 +1,10 @@
 # Configuring cloud and local ARTIS databases
 
+> [!IMPORTANT]
+> This Repo is retired and no longer maintained or being used in the ARTIS end-to-end pipeline.
+>
+> More traditional local RDBMS systems are combersome to setup and maintain as we continue to release multiple versions of the ARTIS database. Confience in database version alignment is critical moving forward for users, and the ARTIS team decided to look for alternative approaches for our evolving situation. We are likely moving to a collection of .parquet files or a single Duckdb to store and query the ARTIS database. 
+
 Instructions for seting up and managing cloud and local instances of the ARTIS database.
 
 - [Installations](#installations)
@@ -10,7 +15,7 @@ Instructions for seting up and managing cloud and local instances of the ARTIS d
 - [Architecture](#directory-and-file-structure)
 - [Database Structure](#database-structure)
 
-**Please Note:** We are migrating our cloud database from Heroku to Vercel and will update these instructions (2024-07-26)
+
 
 ## Installations
 
